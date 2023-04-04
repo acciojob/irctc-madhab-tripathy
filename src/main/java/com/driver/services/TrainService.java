@@ -79,7 +79,7 @@ public class TrainService {
         List<Ticket> ticketList = train.getBookedTickets();
         for(Ticket ticket : ticketList){
             if(ticket.getFromStation().equals(station)){
-                numberOfPeople++;
+                numberOfPeople += ticket.getPassengersList().size();
             }
         }
         return numberOfPeople;
@@ -115,8 +115,9 @@ public class TrainService {
             String stations = train.getRoute();
             String[] routes = stations.split(",");
             for (String s : routes){
-                if(s.equals(String.valueOf(station)) && !train.getDepartureTime().isBefore(startTime) && !train.getDepartureTime().isAfter(endTime)){
-                    trainIds.add(train.getTrainId());
+                if(s.equals(String.valueOf(station)) ){
+                    if(!train.getDepartureTime().isBefore(startTime) && !train.getDepartureTime().isAfter(endTime))
+                        trainIds.add(train.getTrainId());
                     break;
                 }
             }
