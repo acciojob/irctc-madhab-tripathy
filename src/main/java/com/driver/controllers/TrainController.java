@@ -26,7 +26,6 @@ public class TrainController {
 
     @PostMapping("/add")
     public Integer addTrain(@RequestBody AddTrainEntryDto train){
-
         //We need to return the trainId of the newly added train
         Integer trainId = trainService.addTrain(train);
         return trainId;

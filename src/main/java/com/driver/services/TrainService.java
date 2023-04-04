@@ -26,7 +26,18 @@ public class TrainService {
         //and route String logic to be taken from the Problem statement.
         //Save the train and return the trainId that is generated from the database.
         //Avoid using the lombok library
-        return null;
+        StringBuilder route = new StringBuilder();
+        List<Station> stationList = trainEntryDto.getStationRoute();
+        for(Station station : stationList){
+            route.append(station).append(",");
+        }
+        route.deleteCharAt(route.length()-1);
+        Train train = new Train();
+        train.setRoute(route.toString());
+        train.setDepartureTime(trainEntryDto.getDepartureTime());
+        train.setNoOfSeats(trainEntryDto.getNoOfSeats());
+        trainRepository.save(train);
+        return train.getTrainId();
     }
 
     public Integer calculateAvailableSeats(SeatAvailabilityEntryDto seatAvailabilityEntryDto){
@@ -40,6 +51,7 @@ public class TrainService {
         //Inshort : a train has totalNo of seats and there are tickets from and to different locations
         //We need to find out the available seats between the given 2 stations.
 
+
        return null;
     }
 
@@ -49,9 +61,28 @@ public class TrainService {
         //if the trainId is not passing through that station
         //throw new Exception("Train is not passing from this station");
         //  in a happy case we need to find out the number of such people.
-
-
-        return 0;
+        Train train = trainRepository.findById(trainId).get();
+        String route = train.getRoute();
+        String[] routes = route.split(",");
+        String validStation = null;
+        for(String s : routes){
+            if(s.equals(String.valueOf(station))){
+                validStation = s;
+                break;
+            }
+        }
+        if(validStation == null){
+            throw new Exception("Train is not passing from this station");
+        }
+        // count number of peoples
+        int numberOfPeople = 0;
+        List<Ticket> ticketList = train.getBookedTickets();
+        for(Ticket ticket : ticketList){
+            if(ticket.getFromStation().equals(station)){
+                numberOfPeople++;
+            }
+        }
+        return numberOfPeople;
     }
 
     public Integer calculateOldestPersonTravelling(Integer trainId){
@@ -59,8 +90,16 @@ public class TrainService {
         //Throughout the journey of the train between any 2 stations
         //We need to find out the age of the oldest person that is travelling the train
         //If there are no people travelling in that train you can return 0
-
-        return 0;
+        Train train = trainRepository.findById(trainId).get();
+        int oldest = 0;
+        List<Ticket> ticketList = train.getBookedTickets();
+        for(Ticket ticket : ticketList){
+            List<Passenger> passengerList = ticket.getPassengersList();
+            for(Passenger passenger : passengerList){
+                oldest = Math.max(oldest,passenger.getAge());
+            }
+        }
+        return oldest;
     }
 
     public List<Integer> trainsBetweenAGivenTime(Station station, LocalTime startTime, LocalTime endTime){
@@ -70,8 +109,20 @@ public class TrainService {
         //You can assume that the date change doesn't need to be done ie the travel will certainly happen with the same date (More details
         //in problem statement)
         //You can also assume the seconds and milli seconds value will be 0 in a LocalTime format.
+        List<Train> trains = trainRepository.findAll();
+        List<Integer> trainIds = new ArrayList<>();
+        for (Train train : trains){
+            String stations = train.getRoute();
+            String[] routes = stations.split(",");
+            for (String s : routes){
+                if(s.equals(String.valueOf(station)) && !train.getDepartureTime().isBefore(startTime) && !train.getDepartureTime().isAfter(endTime)){
+                    trainIds.add(train.getTrainId());
+                    break;
+                }
+            }
+        }
 
-        return null;
+        return trainIds;
     }
 
 }

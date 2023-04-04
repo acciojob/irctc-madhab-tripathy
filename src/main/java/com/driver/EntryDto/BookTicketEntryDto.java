@@ -8,17 +8,10 @@ import java.util.List;
 public class BookTicketEntryDto {
 
     private List<Integer> passengerIds;
-
-
     private Integer bookingPersonId;
-
     private Integer trainId;
-
-
     private Station fromStation;
-
     private Station toStation;
-
     private int noOfSeats;
 
     public BookTicketEntryDto(List<Integer> passengerIds, Integer trainId, Station fromStation, Station toStation,int noOfSeats,Integer bookingPersonId) {
