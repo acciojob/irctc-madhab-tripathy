@@ -41,28 +41,32 @@ public class TicketService {
         //Save the bookedTickets in the train Object
         //Also in the passenger Entity change the attribute bookedTickets by using the attribute bookingPersonId.
        //And the end return the ticketId that has come from db
+
         Train train = trainRepository.findById(bookTicketEntryDto.getTrainId()).get();
         int numberOfSeatsWantToBook = bookTicketEntryDto.getNoOfSeats();
         // all booked tickets from train
         List<Ticket> ticketList = train.getBookedTickets();
         // all passengers booked the tickets for that train
         int bookedSeats = 0;
-        List<Integer> passengers = bookTicketEntryDto.getPassengerIds();
-        for(Ticket t1 : ticketList) {
-            List<Passenger> passengerList = t1.getPassengersList();
-            for (Integer i : passengers) {
-                Passenger currentPassenger = passengerRepository.findById(i).get();
-                if (passengerList.contains(currentPassenger)) {
-                    bookedSeats += currentPassenger.getBookedTickets().size();
-                    break;
-                }
-            }
-        }
-        train.setNoOfSeats(train.getNoOfSeats() - bookedSeats);
 
-        if(train.getNoOfSeats() - numberOfSeatsWantToBook < 0){
+        for(Ticket ticket1 : ticketList) {
+            bookedSeats += ticket1.getPassengersList().size(); // a passenger have multiple tickets
+
+//            List<Passenger> passengerList = t1.getPassengersList();
+//            for (Integer i : passengers) {
+//                Passenger currentPassenger = passengerRepository.findById(i).get();
+//                if (passengerList.contains(currentPassenger)) {
+//
+//                    break;
+//                }
+//            }
+        }
+//        train.setNoOfSeats(train.getNoOfSeats() - bookedSeats);
+
+        if(bookedSeats+numberOfSeatsWantToBook > train.getNoOfSeats()){
             throw new Exception("Less tickets are available");
         }
+        // find the route, if the route is not valid then through exception
         String[] routes = train.getRoute().split(",");
         int startStation = 0;
         int endStation = 0;
@@ -78,20 +82,34 @@ public class TicketService {
                 toStationAvailable = true;
             }
         }
-        if(!fromStationAvailable || !toStationAvailable){
+        if(!fromStationAvailable || !toStationAvailable || endStation - startStation < 0){
             throw new Exception("Invalid stations");
         }
+        //add all passenger those are booked the tickets in passengerList
+        List<Passenger> passengerList = new ArrayList<>();
+        List<Integer> ids = bookTicketEntryDto.getPassengerIds();
+        for(int id : ids){
+            passengerList.add(passengerRepository.findById(id).get());
+        }
         // now seats are available we can book a tickets
-        Passenger passenger = passengerRepository.findById(bookTicketEntryDto.getBookingPersonId()).get();
 
         Ticket ticket = new Ticket();
+        // save tickets
+        ticket.setPassengersList(passengerList);
         ticket.setFromStation(bookTicketEntryDto.getFromStation());
         ticket.setToStation(bookTicketEntryDto.getToStation());
-        ticket.setTotalFare(endStation-startStation * 300);
+        // find fare per seats
+        // number of seats * distance between 2 station * 300
+        int fare = numberOfSeatsWantToBook * (endStation - startStation) * 300;
+        ticket.setTotalFare(fare);
         ticket.setTrain(train);
+        // save trains
         train.getBookedTickets().add(ticket);
-        ticket.getPassengersList().add(passenger);
+        train.setNoOfSeats(train.getNoOfSeats() - numberOfSeatsWantToBook);
+        // save passengers
+        Passenger passenger = passengerRepository.findById(bookTicketEntryDto.getBookingPersonId()).get();
         passenger.getBookedTickets().add(ticket);
+
         trainRepository.save(train);
         Ticket updateTicket = ticketRepository.save(ticket);
        return updateTicket.getTicketId();
