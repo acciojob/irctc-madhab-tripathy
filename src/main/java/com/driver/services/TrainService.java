@@ -52,21 +52,26 @@ public class TrainService {
         //We need to find out the available seats between the given 2 stations.
         Train train = trainRepository.findById(seatAvailabilityEntryDto.getTrainId()).get();
         // we can get from train trainId, route, List<Ticket>bookedTickets, departureTime, noOfSeats
-        int totalSeatsInTrain = train.getNoOfSeats();
-        int bookedTicketCount = 0;
+
+        int totalSeatsInTrain = train.getNoOfSeats(); // all seats
+        int availableStations = 0; // booked tickets
         List<Ticket> tickets = train.getBookedTickets();
         for(Ticket ticket : tickets){
-            if(ticket.getFromStation().equals(seatAvailabilityEntryDto.getFromStation()) || ticket.getToStation().equals(seatAvailabilityEntryDto.getToStation())){
-                bookedTicketCount += ticket.getPassengersList().size();
+            if(ticket.getFromStation().equals(seatAvailabilityEntryDto.getFromStation())){
+                availableStations += ticket.getPassengersList().size();
+            }
+            if(ticket.getToStation().equals(seatAvailabilityEntryDto.getToStation())){
+                availableStations += ticket.getPassengersList().size();
             }
         }
         // total passengers in the train
-        int totalpassengers = 0;
+        int totalpassengers = 0; // all passengers those who booked tickets
         for(Ticket ticket : tickets){
             totalpassengers += ticket.getPassengersList().size();
         }
         // seat not available
-        int seatsNotAvailable = totalpassengers - bookedTicketCount;
+        int seatsNotAvailable = totalpassengers - availableStations;
+
         return totalSeatsInTrain - seatsNotAvailable;
     }
 
