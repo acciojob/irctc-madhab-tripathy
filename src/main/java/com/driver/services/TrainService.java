@@ -50,9 +50,18 @@ public class TrainService {
         //even if that seat is booked post the destStation or before the boardingStation
         //Inshort : a train has totalNo of seats and there are tickets from and to different locations
         //We need to find out the available seats between the given 2 stations.
-
-
-       return null;
+        Train train = trainRepository.findById(seatAvailabilityEntryDto.getTrainId()).get();
+        // we can get from train trainId, route, List<Ticket>bookedTickets, departureTime, noOfSeats
+        int totalSeatsInTrain = train.getNoOfSeats();
+        int bookedTicketCount = 0;
+        List<Ticket> tickets = train.getBookedTickets();
+        // how many tickets are booked start to end
+        for(Ticket ticket : tickets){
+            if(ticket.getFromStation().equals(seatAvailabilityEntryDto.getFromStation()) && ticket.getToStation().equals(seatAvailabilityEntryDto.getToStation())){
+                bookedTicketCount += ticket.getPassengersList().size();
+            }
+        }
+        return totalSeatsInTrain - bookedTicketCount;
     }
 
     public Integer calculatePeopleBoardingAtAStation(Integer trainId,Station station) throws Exception{

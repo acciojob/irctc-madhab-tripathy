@@ -51,15 +51,6 @@ public class TicketService {
 
         for(Ticket ticket1 : ticketList) {
             bookedSeats += ticket1.getPassengersList().size(); // a passenger have multiple tickets
-
-//            List<Passenger> passengerList = t1.getPassengersList();
-//            for (Integer i : passengers) {
-//                Passenger currentPassenger = passengerRepository.findById(i).get();
-//                if (passengerList.contains(currentPassenger)) {
-//
-//                    break;
-//                }
-//            }
         }
 //        train.setNoOfSeats(train.getNoOfSeats() - bookedSeats);
 
@@ -112,6 +103,7 @@ public class TicketService {
 
         trainRepository.save(train);
         Ticket updateTicket = ticketRepository.save(ticket);
+
        return updateTicket.getTicketId();
     }
 }
