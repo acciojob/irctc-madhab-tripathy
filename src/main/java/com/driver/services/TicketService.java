@@ -50,9 +50,8 @@ public class TicketService {
         int bookedSeats = 0;
 
         for(Ticket ticket1 : ticketList) {
-            bookedSeats += ticket1.getPassengersList().size(); // a passenger have multiple tickets
+            bookedSeats += ticket1.getPassengersList().size(); //  a tickets have multiple passenger
         }
-//        train.setNoOfSeats(train.getNoOfSeats() - bookedSeats);
 
         if(bookedSeats+numberOfSeatsWantToBook > train.getNoOfSeats()){
             throw new Exception("Less tickets are available");
@@ -102,6 +101,7 @@ public class TicketService {
         passenger.getBookedTickets().add(ticket);
 
         trainRepository.save(train);
+
         Ticket updateTicket = ticketRepository.save(ticket);
 
        return updateTicket.getTicketId();

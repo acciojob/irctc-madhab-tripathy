@@ -55,13 +55,19 @@ public class TrainService {
         int totalSeatsInTrain = train.getNoOfSeats();
         int bookedTicketCount = 0;
         List<Ticket> tickets = train.getBookedTickets();
-        // how many tickets are booked start to end
         for(Ticket ticket : tickets){
-            if(ticket.getFromStation().equals(seatAvailabilityEntryDto.getFromStation()) && ticket.getToStation().equals(seatAvailabilityEntryDto.getToStation())){
+            if(ticket.getFromStation().equals(seatAvailabilityEntryDto.getFromStation()) || ticket.getToStation().equals(seatAvailabilityEntryDto.getToStation())){
                 bookedTicketCount += ticket.getPassengersList().size();
             }
         }
-        return totalSeatsInTrain - bookedTicketCount;
+        // total passengers in the train
+        int totalpassengers = 0;
+        for(Ticket ticket : tickets){
+            totalpassengers += ticket.getPassengersList().size();
+        }
+        // seat not available
+        int seatsNotAvailable = totalpassengers - bookedTicketCount;
+        return totalSeatsInTrain - seatsNotAvailable;
     }
 
     public Integer calculatePeopleBoardingAtAStation(Integer trainId,Station station) throws Exception{
