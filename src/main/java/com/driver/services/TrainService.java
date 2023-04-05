@@ -123,7 +123,9 @@ public class TrainService {
                     int departureTimeInMin = (train.getDepartureTime().getHour() * 60) + train.getDepartureTime().getMinute();
                     int reachingTimeInMin  = departureTimeInMin + (i * 60);
                     if(reachingTimeInMin >= startTimeInMin && reachingTimeInMin <= lastTimeInMin)
+                    {
                         trainIds.add(train.getTrainId());
+                    }
                 }
                 i++;
             }

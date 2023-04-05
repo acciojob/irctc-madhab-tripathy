@@ -47,13 +47,13 @@ public class TicketService {
         List<Ticket> ticketList = train.getBookedTickets();
         // all passengers booked the tickets for that train
         int bookedSeats = 0;
-        List<Integer> passenger1 = bookTicketEntryDto.getPassengerIds();
+        List<Integer> passengers = bookTicketEntryDto.getPassengerIds();
         for(Ticket t1 : ticketList) {
-            List<Passenger> p2 = t1.getPassengersList();
-            for (Integer i : passenger1) {
-                Passenger p1 = passengerRepository.findById(i).get();
-                if (p2.contains(p1)) {
-                    bookedSeats++;
+            List<Passenger> passengerList = t1.getPassengersList();
+            for (Integer i : passengers) {
+                Passenger currentPassenger = passengerRepository.findById(i).get();
+                if (passengerList.contains(currentPassenger)) {
+                    bookedSeats += currentPassenger.getBookedTickets().size();
                     break;
                 }
             }
