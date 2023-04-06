@@ -72,7 +72,7 @@ public class TicketService {
                 toStationAvailable = true;
             }
         }
-        if(!fromStationAvailable || !toStationAvailable || endStation - startStation < 0){
+        if(!fromStationAvailable || !toStationAvailable){
             throw new Exception("Invalid stations");
         }
         //add all passenger those are booked the tickets in passengerList
